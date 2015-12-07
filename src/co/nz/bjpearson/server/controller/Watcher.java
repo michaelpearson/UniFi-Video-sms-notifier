@@ -1,7 +1,7 @@
 package co.nz.bjpearson.server.controller;
 
-import datasource.AlertProvider;
-import sms.SmsService;
+import co.nz.bjpearson.server.datasource.AlertProvider;
+import co.nz.bjpearson.server.sms.SmsService;
 
 /**
  * Created by mpearson on 7/12/2015.

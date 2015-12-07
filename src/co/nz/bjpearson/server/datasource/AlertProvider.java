@@ -1,6 +1,6 @@
 package co.nz.bjpearson.server.datasource;
 
-import model.Alert;
+import co.nz.bjpearson.server.model.Alert;
 
 import java.util.Enumeration;
 
