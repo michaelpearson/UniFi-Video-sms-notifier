@@ -1,12 +1,11 @@
 package co.nz.bjpearson.server.datasource;
 
+
 import co.nz.bjpearson.server.model.Alert;
 
-import java.util.Enumeration;
+import java.io.IOException;
+import java.util.List;
 
-/**
- * Created by mpearson on 7/12/2015.
- */
 public abstract class AlertProvider {
-    public abstract Enumeration<Alert> retreiveAlerts();
+    public abstract List<Alert> retrieveAlerts() throws IOException;
 }
