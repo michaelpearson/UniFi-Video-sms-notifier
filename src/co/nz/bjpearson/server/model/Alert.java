@@ -45,4 +45,36 @@ public class Alert {
     private void log(String message) {
         System.out.println(message);
     }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getAdmin() {
+        return admin;
+    }
+
+    public String getAlertType() {
+        return alertType;
+    }
+
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public Date getDate() {
+        return date;
+    }
 }

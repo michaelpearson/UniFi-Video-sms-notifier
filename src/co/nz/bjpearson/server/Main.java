@@ -1,7 +1,9 @@
 package co.nz.bjpearson.server;
 
 import co.nz.bjpearson.server.datasource.UniFiApi;
+import co.nz.bjpearson.server.model.StandardAlert;
 import co.nz.bjpearson.server.model.sms.BurstSms;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -11,6 +13,8 @@ import java.io.*;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Main {
     private static final String DEFAULT_CONFIG = "configuration.json";
@@ -48,6 +52,7 @@ public class Main {
 
     public static void main(String[] argv) {
         String smsApiKey, smsApiSecret, unifiBaseUrl, unifiApiKey;
+        Set<String> recipients = new HashSet<>();
         File configFile;
         if(argv.length == 4) {
             smsApiKey = argv[0];
@@ -61,6 +66,10 @@ public class Main {
                 smsApiSecret = (String)((JSONObject)configuration.get("burstSms")).get("apiSecret");
                 unifiBaseUrl = (String)((JSONObject)configuration.get("uniFiVideo")).get("baseUrl");
                 unifiApiKey = (String)((JSONObject)configuration.get("uniFiVideo")).get("apiKey");
+                JSONArray r = (JSONArray)((JSONObject)configuration.get("alerts")).get("recipients");
+                for(Object recipient : r) {
+                    recipients.add((String)recipient);
+                }
             } catch (IOException | ParseException e) {
                 e.printStackTrace();
                 return;
@@ -73,7 +82,7 @@ public class Main {
             unifiBaseUrl += "/";
         }
         try {
-            new NotificationWatcher(new BurstSms(smsApiKey, smsApiSecret), new UniFiApi(unifiBaseUrl, unifiApiKey)).start();
+            new NotificationWatcher(new UniFiApi(unifiBaseUrl, unifiApiKey), new StandardAlert(new BurstSms(smsApiKey, smsApiSecret), recipients)).start();
         } catch(Exception e) {
             e.printStackTrace();
         }

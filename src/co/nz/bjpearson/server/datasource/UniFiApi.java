@@ -20,9 +20,7 @@ public class UniFiApi extends AlertProvider {
     public UniFiApi(String baseUrl, String apiKey) {
         API_KEY = apiKey;
         BASE_URL = baseUrl;
-
     }
-
 
     @Override
     public List<Alert> retrieveAlerts() throws IOException {
@@ -30,6 +28,9 @@ public class UniFiApi extends AlertProvider {
         HttpsURLConnection connection = (HttpsURLConnection)(new URL(endpoint).openConnection());
         connection.setDoOutput(true);
         JSONObject resp = (JSONObject) JSONValue.parse(new InputStreamReader(connection.getInputStream()));
+        if(!(resp.get("data") instanceof JSONArray)) {
+            throw new RuntimeException((String)((JSONObject)resp.get("data")).get("message"));
+        }
         JSONArray data = (JSONArray)resp.get("data");
         List<Alert> alerts = new ArrayList<>();
         int i = 0;

@@ -39,9 +39,9 @@ public class BurstSms extends SmsFactory {
 
             @Override
             public void send() throws IOException {
-                HttpsURLConnection connection = (HttpsURLConnection) SEND_ENDPOINT.openConnection();
-                connection.setDoInput(true);
-
+                System.out.println(String.format("Send sms! first recipient: %s sms body: %s", recipients.toArray()[0], message));
+                //HttpsURLConnection connection = (HttpsURLConnection) SEND_ENDPOINT.openConnection();
+                //connection.setDoInput(true);
             }
 
             @Override
