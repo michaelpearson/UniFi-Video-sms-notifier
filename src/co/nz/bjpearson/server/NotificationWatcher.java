@@ -1,4 +1,4 @@
-package co.nz.bjpearson.server.controller;
+package co.nz.bjpearson.server;
 
 import co.nz.bjpearson.server.datasource.AlertProvider;
 import co.nz.bjpearson.server.model.Alert;
@@ -7,12 +7,12 @@ import co.nz.bjpearson.server.model.sms.SmsFactory;
 import java.io.IOException;
 import java.util.List;
 
-public class Watcher extends Thread {
+public class NotificationWatcher extends Thread {
     private final SmsFactory smsFactory;
     private final AlertProvider alertProvider;
-    private long lastAlertTimestamp = 0;
+    private long lastAlertTimestamp = -1;
 
-    public Watcher(SmsFactory service, AlertProvider alertProvider) {
+    public NotificationWatcher(SmsFactory service, AlertProvider alertProvider) {
         this.smsFactory = service;
         this.alertProvider = alertProvider;
     }
