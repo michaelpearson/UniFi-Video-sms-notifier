@@ -3,7 +3,6 @@ package co.nz.bjpearson.server;
 import co.nz.bjpearson.server.datasource.AlertProvider;
 import co.nz.bjpearson.server.model.Alert;
 import co.nz.bjpearson.server.model.AlertDispatcher;
-import co.nz.bjpearson.server.model.sms.SmsFactory;
 
 import java.io.IOException;
 import java.util.Date;
@@ -15,17 +14,21 @@ public class NotificationWatcher extends Thread {
     private final AlertProvider alertProvider;
     private final AlertDispatcher alertDispatcher;
 
-    private long lastAlertTimestamp = 0;
+    private long lastAlertTimestamp;
     private long lastAlertSentAt = 0;
 
-    private static final int MAX_QUEUE_SIZE = 5;
-    private static final int QUEUE_DISPATCH_TIMEOUT = 20; //20 seconds
+    private int maxQueueSize;
+    private int queueDispatchTimeout;
 
     private Set<Alert> alertQueue = new HashSet<>();
 
-    public NotificationWatcher(AlertProvider alertProvider, AlertDispatcher dispatcher) {
+    public NotificationWatcher(AlertProvider alertProvider, AlertDispatcher dispatcher, int maxQueueSize, int queueDispatchTimeout) {
         this.alertDispatcher = dispatcher;
         this.alertProvider = alertProvider;
+        this.maxQueueSize = maxQueueSize;
+        this.queueDispatchTimeout = queueDispatchTimeout;
+
+        this.lastAlertTimestamp = this.lastAlertSentAt = getTimestamp();
     }
 
     private static long getTimestamp() {
@@ -38,9 +41,9 @@ public class NotificationWatcher extends Thread {
         for(Alert a : alerts) {
             if(a.getTimestamp() > lastAlertTimestamp) {
                 newLastAlert = a.getTimestamp();
+                a.debug();
                 alertQueue.add(a);
             }
-            a.debug();
         }
         lastAlertTimestamp = newLastAlert;
     }
@@ -50,9 +53,7 @@ public class NotificationWatcher extends Thread {
         try {
             while(!Thread.interrupted()) {
                 updateAlertQueue();
-                if(alertQueue.size() > 0) {
-                    dispatchAlerts();
-                }
+                dispatchAlerts();
                 Thread.sleep(1000);
             }
         } catch (InterruptedException | IOException e) {
@@ -61,10 +62,7 @@ public class NotificationWatcher extends Thread {
     }
 
     private void dispatchAlerts() throws IOException {
-        if(lastAlertSentAt == 0 || lastAlertTimestamp == 0) {
-            lastAlertSentAt = lastAlertTimestamp = getTimestamp();
-        }
-        if(getTimestamp() - lastAlertSentAt > QUEUE_DISPATCH_TIMEOUT || alertQueue.size() > MAX_QUEUE_SIZE) {
+        if((((getTimestamp() - lastAlertSentAt) > queueDispatchTimeout) && alertQueue.size() > 0) || alertQueue.size() > maxQueueSize) {
             lastAlertSentAt = getTimestamp();
             alertDispatcher.sendAlerts(alertQueue).send();
             alertQueue.clear();
