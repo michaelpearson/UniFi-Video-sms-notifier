@@ -1,6 +1,6 @@
 package co.nz.bjpearson.server;
 
-import co.nz.bjpearson.server.datasource.AlertProvider;
+import co.nz.bjpearson.server.datasource.VideoSystem;
 import co.nz.bjpearson.server.model.Alert;
 import co.nz.bjpearson.server.model.AlertDispatcher;
 
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 public class NotificationWatcher extends Thread {
-    private final AlertProvider alertProvider;
+    private final VideoSystem videoSystem;
     private final AlertDispatcher alertDispatcher;
 
     private long lastAlertTimestamp;
@@ -22,9 +22,9 @@ public class NotificationWatcher extends Thread {
 
     private Set<Alert> alertQueue = new HashSet<>();
 
-    public NotificationWatcher(AlertProvider alertProvider, AlertDispatcher dispatcher, int maxQueueSize, int queueDispatchTimeout) {
+    public NotificationWatcher(VideoSystem videoSystem, AlertDispatcher dispatcher, int maxQueueSize, int queueDispatchTimeout) {
         this.alertDispatcher = dispatcher;
-        this.alertProvider = alertProvider;
+        this.videoSystem = videoSystem;
         this.maxQueueSize = maxQueueSize;
         this.queueDispatchTimeout = queueDispatchTimeout;
 
@@ -36,7 +36,7 @@ public class NotificationWatcher extends Thread {
     }
 
     private void updateAlertQueue() throws IOException {
-        List<Alert> alerts = alertProvider.retrieveAlerts();
+        List<Alert> alerts = videoSystem.retrieveAlerts();
         long newLastAlert = lastAlertTimestamp;
         for(Alert a : alerts) {
             if(a.getTimestamp() > lastAlertTimestamp) {

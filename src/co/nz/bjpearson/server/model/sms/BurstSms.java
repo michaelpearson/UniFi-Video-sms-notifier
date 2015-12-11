@@ -46,7 +46,6 @@ public class BurstSms extends SmsFactory {
 
             @Override
             public void send() throws IOException {
-                /*
                 System.out.println(String.format("Begin SMS\n-------------------------\n%s\n-------------------------\n", message));
                 HttpsURLConnection connection = getConnection(SEND_ENDPOINT);
                 connection.setRequestMethod("POST");
@@ -59,19 +58,14 @@ public class BurstSms extends SmsFactory {
                 }
                 String data = String.format("message=%s&to=%s", URLEncoder.encode(message, "utf-8"), URLEncoder.encode(String.join(",", recipients), "utf-8"));
                 connection.getOutputStream().write(data.getBytes());
+                JSONObject response;
                 try {
-                    JSONObject response = (JSONObject)new JSONParser().parse(new InputStreamReader(connection.getInputStream()));
+                    response = (JSONObject)new JSONParser().parse(new InputStreamReader(connection.getInputStream()));
                     System.out.println(response.toJSONString());
                 } catch(ParseException e) {
                     throw new RuntimeException("Error parsing response");
                 }
-                */
-                JSONObject resp;
-                try {
-                    resp = (JSONObject)new JSONParser().parse("{\"cost\":0.099,\"recipients\":1,\"sms\":1,\"delivery_stats\":{\"optouts\":0,\"pending\":0,\"responses\":0,\"delivered\":0,\"bounced\":0},\"send_at\":\"2015-12-09 00:16:05\",\"message_id\":30704520,\"error\":{\"code\":\"SUCCESS\",\"description\":\"OK\"}}");
-                } catch(ParseException e) {return;}
-                this.messageId = (long)resp.get("message_id");
-
+                this.messageId = (long)response.get("message_id");
             }
 
             @Override
