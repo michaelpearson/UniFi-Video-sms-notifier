@@ -3,6 +3,7 @@ package co.nz.bjpearson.server;
 import co.nz.bjpearson.server.datasource.VideoSystem;
 import co.nz.bjpearson.server.model.Alert;
 import co.nz.bjpearson.server.model.AlertDispatcher;
+import co.nz.bjpearson.server.model.Recording;
 
 import java.io.IOException;
 import java.util.Date;
@@ -20,7 +21,7 @@ public class NotificationWatcher extends Thread {
     private int maxQueueSize;
     private int queueDispatchTimeout;
 
-    private Set<Alert> alertQueue = new HashSet<>();
+    private Set<Recording> alertQueue = new HashSet<>();
 
     public NotificationWatcher(VideoSystem videoSystem, AlertDispatcher dispatcher, int maxQueueSize, int queueDispatchTimeout) {
         this.alertDispatcher = dispatcher;
@@ -36,13 +37,13 @@ public class NotificationWatcher extends Thread {
     }
 
     private void updateAlertQueue() throws IOException {
-        List<Alert> alerts = videoSystem.retrieveAlerts();
+        List<Recording> recordings = videoSystem.retrieveRecordings();
         long newLastAlert = lastAlertTimestamp;
-        for(Alert a : alerts) {
-            if(a.getTimestamp() > lastAlertTimestamp) {
-                newLastAlert = a.getTimestamp();
-                a.debug();
-                alertQueue.add(a);
+        for(Recording r : recordings) {
+            if(r.getStartTime().getTime() > lastAlertTimestamp) {
+                newLastAlert = r.getStartTime().getTime();
+                r.debug();
+                alertQueue.add(r);
             }
         }
         lastAlertTimestamp = newLastAlert;

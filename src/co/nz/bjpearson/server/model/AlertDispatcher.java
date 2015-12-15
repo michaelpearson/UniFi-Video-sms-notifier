@@ -14,5 +14,5 @@ public abstract class AlertDispatcher {
         this.recipients = recipients;
     }
 
-    public abstract Sms sendAlerts(Set<Alert> alerts);
+    public abstract Sms sendAlerts(Set<Recording> alerts);
 }

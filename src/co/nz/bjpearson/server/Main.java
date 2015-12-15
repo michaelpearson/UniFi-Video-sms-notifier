@@ -59,7 +59,7 @@ public class Main {
         }
     }
 
-    private static void addTrustedCertificate(String certificatePath) {
+    public static void addTrustedCertificate(String certificatePath) {
         TrustManager[] trustAllCerts = new TrustManager[] {
                 new X509TrustManager() {
                     public java.security.cert.X509Certificate[] getAcceptedIssuers() {

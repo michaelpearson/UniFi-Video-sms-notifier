@@ -15,6 +15,8 @@ import java.util.Set;
 
 public class BurstSms extends SmsFactory {
 
+    private static final boolean LIVE = false;
+
     private final String apiKey;
     private final String apiSecret;
     private long messageId = 0;
@@ -47,6 +49,9 @@ public class BurstSms extends SmsFactory {
             @Override
             public void send() throws IOException {
                 System.out.println(String.format("Begin SMS\n-------------------------\n%s\n-------------------------\n", message));
+                if(!LIVE) {
+                    return;
+                }
                 HttpsURLConnection connection = getConnection(SEND_ENDPOINT);
                 connection.setRequestMethod("POST");
                 connection.setDoOutput(true);
@@ -61,7 +66,7 @@ public class BurstSms extends SmsFactory {
                 JSONObject response;
                 try {
                     response = (JSONObject)new JSONParser().parse(new InputStreamReader(connection.getInputStream()));
-                    System.out.println(response.toJSONString());
+                    //System.out.println(response.toJSONString());
                 } catch(ParseException e) {
                     throw new RuntimeException("Error parsing response");
                 }

@@ -15,16 +15,12 @@ public class StandardAlert extends AlertDispatcher {
     }
 
     @Override
-    public Sms sendAlerts(Set<Alert> alerts) {
+    public Sms sendAlerts(Set<Recording> alerts) {
         StringBuilder alertMessage = new StringBuilder();
-        int i = 0;
-        for(Alert a : alerts) {
-            alertMessage.append(String.format("Alert %d received at: ", ++i));
-            alertMessage.append(a.getDate().toString());
-            alertMessage.append("\n");
-            alertMessage.append("Alert type: ");
-            alertMessage.append(a.getType());
-            alertMessage.append("\n");
+        int i = 1;
+        for(Recording r : alerts) {
+            alertMessage.append(String.format("Alert %d: %s\n", i++, r.getStartTime().toString()));
+            alertMessage.append(String.format("Zone: %s\n", r.getNotes()));
         }
         return smsFactory.createSms(alertMessage.toString(), recipients);
     }

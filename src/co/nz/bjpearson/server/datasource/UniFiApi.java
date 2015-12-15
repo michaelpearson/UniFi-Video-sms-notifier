@@ -51,8 +51,9 @@ public class UniFiApi extends VideoSystem {
             }
             for(String value : kv.getValue()) {
                 endpoint.append(key);
-                endpoint.append("&");
+                endpoint.append("=");
                 endpoint.append(value);
+                endpoint.append("&");
             }
         }
         return(new URL(endpoint.toString()));
@@ -63,12 +64,9 @@ public class UniFiApi extends VideoSystem {
     @Override
     public List<Alert> retrieveAlerts() throws IOException {
         Map<String, String[]> parameters = new HashMap<>();
-
         parameters.put("archived", new String[] {"false"});
 
-
-        String endpoint = BASE_URL + ALERT_SUFFIX + "?archived=false&apiKey=" + API_KEY;
-        HttpsURLConnection connection = (HttpsURLConnection)(new URL(endpoint).openConnection());
+        HttpsURLConnection connection = (HttpsURLConnection)(buildEndpoint(ALERT_SUFFIX, parameters).openConnection());
         connection.setDoOutput(true);
         JSONObject resp = (JSONObject) JSONValue.parse(new InputStreamReader(connection.getInputStream()));
         if(!(resp.get("data") instanceof JSONArray)) {
@@ -85,19 +83,19 @@ public class UniFiApi extends VideoSystem {
 
     @Override
     public List<Recording> retrieveRecordings() throws IOException {
-        String endpoint = BASE_URL + RECORDINGS_SUFFIX + "?archived=false&apiKey=" + API_KEY;
-        HttpsURLConnection connection = (HttpsURLConnection)(new URL(endpoint).openConnection());
+        Map<String, String[]> parameters = new HashMap<>();
+        HttpsURLConnection connection = (HttpsURLConnection)(buildEndpoint(RECORDINGS_SUFFIX, parameters).openConnection());
         connection.setDoOutput(true);
         JSONObject resp = (JSONObject) JSONValue.parse(new InputStreamReader(connection.getInputStream()));
         if(!(resp.get("data") instanceof JSONArray)) {
             throw new RuntimeException((String)((JSONObject)resp.get("data")).get("message"));
         }
         JSONArray data = (JSONArray)resp.get("data");
-        List<Alert> alerts = new ArrayList<>();
+        List<Recording> recordings = new ArrayList<>();
         int i = 0;
         for(Object a : data) {
-            alerts.add(Alert.fromJson(i++, (JSONObject)a));
+            recordings.add(Recording.fromJson(i++, (JSONObject)a));
         }
-        return null;
+        return recordings;
     }
 }
