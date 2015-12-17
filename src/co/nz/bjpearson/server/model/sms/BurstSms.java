@@ -15,7 +15,7 @@ import java.util.Set;
 
 public class BurstSms extends SmsFactory {
 
-    private static final boolean LIVE = false;
+    private static final boolean LIVE = true;
 
     private final String apiKey;
     private final String apiSecret;

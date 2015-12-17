@@ -23,6 +23,8 @@ public class NotificationWatcher extends Thread {
 
     private Set<Recording> alertQueue = new HashSet<>();
 
+    private static final int MINIMUM_LENGTH = 24 * 1000;
+
     public NotificationWatcher(VideoSystem videoSystem, AlertDispatcher dispatcher, int maxQueueSize, int queueDispatchTimeout) {
         this.alertDispatcher = dispatcher;
         this.videoSystem = videoSystem;
@@ -38,12 +40,21 @@ public class NotificationWatcher extends Thread {
 
     private void updateAlertQueue() throws IOException {
         List<Recording> recordings = videoSystem.retrieveRecordings();
+        System.out.println(String.format("Got %d recordings", recordings.size()));
         long newLastAlert = lastAlertTimestamp;
         for(Recording r : recordings) {
             if(r.getStartTime().getTime() > lastAlertTimestamp) {
+                if(r.isInProgress()) {
+                    System.out.println("Recording in progress, ignoring");
+                    continue;
+                }
                 newLastAlert = r.getStartTime().getTime();
+                if(r.getLength() > MINIMUM_LENGTH) {
+                    alertQueue.add(r);
+                } else {
+                    System.out.print("Did not add recording due to insufficient length: ");
+                }
                 r.debug();
-                alertQueue.add(r);
             }
         }
         lastAlertTimestamp = newLastAlert;
@@ -55,7 +66,7 @@ public class NotificationWatcher extends Thread {
             while(!Thread.interrupted()) {
                 updateAlertQueue();
                 dispatchAlerts();
-                Thread.sleep(1000);
+                Thread.sleep(10000);
             }
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();

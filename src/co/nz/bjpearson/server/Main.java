@@ -28,7 +28,7 @@ public class Main {
                 e.printStackTrace();
                 return;
             }
-        } else if(argv.length == 1 && (configFile = new File(argv[1])).exists()) {
+        } else if(argv.length == 1 && (configFile = new File(argv[0])).exists()) {
             try {
                 Configuration.loadConfiguration(configFile);
             } catch (IOException | InvalidConfigurationException e) {
@@ -94,9 +94,11 @@ public class Main {
         }
 
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        HostnameVerifier allHostsValid = (hostname, session) -> {
-            System.out.println(hostname);
-            return(true);
+        HostnameVerifier allHostsValid = new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return (true);
+            }
         };
         HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
     }

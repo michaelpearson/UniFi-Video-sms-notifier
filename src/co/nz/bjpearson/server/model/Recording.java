@@ -1,7 +1,10 @@
 package co.nz.bjpearson.server.model;
 
+import co.nz.bjpearson.server.Configuration;
+import co.nz.bjpearson.server.datasource.UniFiApi;
 import org.json.simple.JSONObject;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class Recording {
@@ -54,7 +57,12 @@ public class Recording {
 
 
     public void debug() {
-        System.out.println(String.format("Recording: %s, notes: %s, date time: %s", id, notes, startTime.toString()));
+        System.out.println(String.format("Recording: %s, notes: %s, date time: %s, length: %d, %s",
+                id,
+                notes,
+                startTime.toString(),
+                length / 1000,
+                getSnapshotUrl()));
     }
 
     public String getId() {
@@ -103,5 +111,26 @@ public class Recording {
 
     public String getStatus() {
         return status;
+    }
+
+    public String getSnapshotUrl() {
+        return(getSnapshotUrl(false));
+    }
+
+    public String getSnapshotUrl(boolean thumbnail) {
+        return(getSnapshotUrl(Configuration.UNIFI_BASE_URL, thumbnail));
+    }
+
+    public String getSnapshotUrl(String unifiBaseUrl, boolean thumbnail) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(getStartTime());
+        return(String.format("%sapi/2.0/snapshot/recording/%s/%d/%d/%d/%s",
+                unifiBaseUrl,
+                getCameraUuid(),
+                c.get(Calendar.YEAR),
+                c.get(Calendar.MONTH),
+                c.get(Calendar.DAY_OF_MONTH),
+                getId()
+                ) + (thumbnail ? "thumb=true" : ""));
     }
 }

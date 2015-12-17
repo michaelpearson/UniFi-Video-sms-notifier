@@ -84,6 +84,11 @@ public class UniFiApi extends VideoSystem {
     @Override
     public List<Recording> retrieveRecordings() throws IOException {
         Map<String, String[]> parameters = new HashMap<>();
+
+        parameters.put("sortby", new String[] {"startTime"});
+        parameters.put("sort", new String[] {"desc"});
+        parameters.put("limit", new String[] {"10"});
+
         HttpsURLConnection connection = (HttpsURLConnection)(buildEndpoint(RECORDINGS_SUFFIX, parameters).openConnection());
         connection.setDoOutput(true);
         JSONObject resp = (JSONObject) JSONValue.parse(new InputStreamReader(connection.getInputStream()));
